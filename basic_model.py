@@ -4,9 +4,6 @@ import numpy as np
 from metadrive.envs import MetaDriveEnv
 
 
-# ==========================================
-# TUNABLE ENVIRONMENT CONFIGURATION
-# ==========================================
 class Config:
     # map settings
     MAP_SEED = 42         
