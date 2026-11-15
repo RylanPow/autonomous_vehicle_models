@@ -16,7 +16,7 @@ class Config:
     WINDOW_SIZE = (1000, 800)
     CAM_RES = (320, 180)  # (width, height) for attached vehicle cameras
 
-    # Lidar safety controller settings
+    # lidar safety controller settings
     NUM_LASERS = 240
     LIDAR_MAX_DIST = 50.0  # meters
     STOP_THRESHOLD_M = 12.0  # brake if obstacle is closer than 12m in front
