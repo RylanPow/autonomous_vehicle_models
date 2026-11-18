@@ -135,7 +135,7 @@ class ParticleFilterPolicy(BasePolicy):
             self.update(sensor_packet["gps_xy"], sensor_packet["compass_theta"])
             n_eff, resampled = self.resample_if_needed()
 
-        # 3. compute weighted pose estimate
+        # compute weighted pose estimate
         est_x, est_y, est_theta = self.estimate_state()
 
         # diagnostics for monitoring PF
