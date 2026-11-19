@@ -3,44 +3,52 @@ experiment:
   checkpoint_path: "checkpoints/ppo_metadrive_best.pt"
   eval_suite: "quick_dev"
   render_eval: true
-
 env:
   start_seed: 1000
-  scenarios_per_worker: 25
+  scenarios_per_worker: 8      # Down from 25 -> 96 total maps instead of 300 (3x faster convergence)
   traffic_density: 0.08
   decision_repeat: 5
   horizon: 1000
   vehicle_config: {}
+# -scenarios down from 25 -> 96 total maps instead of 300 for 3x faster convergence
 
 network:
   hidden_dim: 256
-  init_log_std: -1.2
-  log_std_min: -2.8
-  log_std_max: -0.3
+  init_log_std: -0.5    
+  log_std_min: -2.0
+  log_std_max: 0.0
+# up from init_log_std -0.5 from -1.2 so agent explroes full throttle and steering early
 
 training:
-  total_steps: 1200000
+  total_steps: 800000          
   num_envs: 12
   steps_per_env: 256
   batch_size: 1024
-  update_epochs: 8
+  update_epochs: 10
   lr_start: 0.0003
-  lr_end: 0.00003
+  lr_end: 0.00005
   adam_eps: 0.00001
   gamma: 0.99
   gae_lambda: 0.95
   clip_eps: 0.2
-  entropy_coef: 0.002
+  entropy_coef: 0.005      
   value_coef: 0.5
   max_grad_norm: 0.5
   min_save_steps: 50000
   log_every_rollouts: 3
+# total steps: peaks much faster once reward scale & map pool are fixed
+# higher entropy coeff prevents premature plateau
 
 reward_shaping:
-  lane_center_weight: 0.12
-  lane_offset_clip: 4.0
-  steer_delta_weight: 0.25
-  front_warn_dist_m: 14.0
+  lane_center_weight: 0.02     
+  lane_offset_clip: 3.5
+  steer_delta_weight: 0.10     
+  front_warn_dist_m: 16.0      
   min_warn_speed_ms: 2.0
-  front_proximity_weight: 0.35
-  terminal_crash_penalty: 3.0
+  front_proximity_weight: 0.25
+  terminal_crash_penalty: 5.0 
+
+# lane center weight down from 0.12 to eliminate -377 per step penalty hole
+# steer delta down form 0.25 to prevent overdamping sharp turns on curves
+# front warn dist: upped to look further ahead from braking.
+# terminal crash penalty: upped instead of per-step drag

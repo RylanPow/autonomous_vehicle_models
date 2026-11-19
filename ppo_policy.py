@@ -53,6 +53,9 @@ class SquashedActorCritic(nn.Module):
     def _dist(self, obs):
         h = self.actor_backbone(obs)
         mean = self.mu_head(h)
+        with torch.no_grad():
+            self.mu_head.bias[0] = 0.0   # Neutral steering
+            self.mu_head.bias[1] = 0.6   # Forward throttle bias so it immediately drives & explores curves
         std = torch.exp(self.log_std.clamp(self.log_std_min, self.log_std_max))
         return Normal(mean, std)
 
@@ -159,6 +162,8 @@ def _shape_av_reward(env, base_reward, obs, action, prev_action, info, rew_cfg):
     lidar_norm = obs[-240:]
     front_min_m = float(np.min(np.concatenate([lidar_norm[:8], lidar_norm[-8:]]) * 50.0))
     speed = float(env.agent.speed)
+    speed_factor = min(speed / 10.0, 1.0)
+    shaped -= float(rew_cfg["lane_center_weight"]) * clipped_offset * speed_factor
     warn_dist = float(rew_cfg["front_warn_dist_m"])
     if front_min_m < warn_dist and speed > float(rew_cfg["min_warn_speed_ms"]):
         proximity_ratio = (warn_dist - front_min_m) / warn_dist
