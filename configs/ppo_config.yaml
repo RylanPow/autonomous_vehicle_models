@@ -1,0 +1,46 @@
+experiment:
+  name: "PPO_Tuned"
+  checkpoint_path: "checkpoints/ppo_metadrive_best.pt"
+  eval_suite: "quick_dev"
+  render_eval: true
+
+env:
+  start_seed: 1000
+  scenarios_per_worker: 25
+  traffic_density: 0.08
+  decision_repeat: 5
+  horizon: 1000
+  vehicle_config: {}
+
+network:
+  hidden_dim: 256
+  init_log_std: -1.2
+  log_std_min: -2.8
+  log_std_max: -0.3
+
+training:
+  total_steps: 1200000
+  num_envs: 12
+  steps_per_env: 256
+  batch_size: 1024
+  update_epochs: 8
+  lr_start: 0.0003
+  lr_end: 0.00003
+  adam_eps: 0.00001
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_eps: 0.2
+  entropy_coef: 0.002
+  value_coef: 0.5
+  max_grad_norm: 0.5
+  min_save_steps: 50000
+  log_every_rollouts: 3
+
+reward_shaping:
+  lane_center_weight: 0.12
+  lane_offset_clip: 4.0
+  steer_delta_weight: 0.25
+  front_warn_dist_m: 14.0
+  min_warn_speed_ms: 2.0
+  front_proximity_weight: 0.35
+  terminal_crash_penalty: 3.0
