@@ -35,9 +35,12 @@ BENCHMARK_SUITES = {
 }
 
 
+
 class BasePolicy:
     """Common interface for classical filters, SLAM, and RL policies."""
     name = "BasePolicy"
+    decision_repeat = 1      # 1 = 50 Hz (classical control), 5 = 10 Hz (standard RL)
+    vehicle_config = {}      # Override in subclasses that need extra detectors (e.g., SLAM)
 
     def reset(self, env, obs, sensor_packet):
         pass
@@ -48,7 +51,6 @@ class BasePolicy:
     def get_estimated_pose(self):
         """Optional: return [x, y, theta] if the policy performs localization."""
         return None
-
 
 class SensorBus:
     """Provides realistic noisy sensor readings alongside MetaDrive's standard `obs`."""
@@ -201,7 +203,9 @@ def run_benchmark(
     stagnation_limit_steps=200,
 ):
     suite = BENCHMARK_SUITES[suite_name]
-    dt = 0.02
+    decision_repeat = getattr(policy, "decision_repeat", 1)
+    dt = 0.02 * decision_repeat  # 0.02s at repeat=1 (50 Hz), 0.10s at repeat=5 (10 Hz)
+    vehicle_cfg = getattr(policy, "vehicle_config", {})
 
     env_config = {
         "use_render": render,
@@ -210,13 +214,10 @@ def run_benchmark(
         "num_scenarios": suite["num_scenarios"],
         "map": suite["map"],
         "traffic_density": suite["traffic_density"],
-        "decision_repeat": 1,
+        "decision_repeat": decision_repeat,
         "show_logo": False,
         "show_fps": True,
-        "vehicle_config": {
-            "lane_line_detector": {"num_lasers": 36, "distance": 20.0},
-            "side_detector": {"num_lasers": 12, "distance": 10.0},
-        },
+        "vehicle_config": vehicle_cfg,
     }
 
     print(f"\n============================================================")

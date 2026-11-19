@@ -19,6 +19,11 @@ class OccupancyGridSLAMPolicy(BasePolicy):
         icp_iters=12,
         visualize=True,
         verbose_every=25,
+        decision_repeat = 1,
+        vehicle_config = {
+        "lane_line_detector": {"num_lasers": 36, "distance": 20.0},
+        "side_detector": {"num_lasers": 12, "distance": 10.0},
+    }
     ):
         self.name = f"2D_ICP_OccupancySLAM(res={resolution}m)"
         self.grid_size = grid_size
