@@ -317,7 +317,7 @@ if __name__ == "__main__":
     # pf_policy = ParticleFilterPolicy(num_particles=300, verbose_every=50)
     # run_benchmark(pf_policy, suite_name="quick_dev", render=True)
 
-    from slam_policy import OccupancyGridSLAMPolicy
+    from autonomous_models.policies.slam_policy import OccupancyGridSLAMPolicy
 
     slam_policy = OccupancyGridSLAMPolicy(resolution=0.4, visualize=True, verbose_every=25)
     run_benchmark(slam_policy, suite_name="slam_static_loop", render=True)
